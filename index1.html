@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SaaS CS Bot — Portfolio Demo</title>
+<meta name="description" content="Chatbot de Customer Success construído com N8N, Groq e Google Sheets. Portfolio Demo " />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+<style>
+  :root {
+    --nola-dark: #0F172A;
+    --nola-coral: #FF6B6B;
+    --nola-coral-light: #FF8E8E;
+    --nola-coral-pale: #FFE5E5;
+    --bg: #FAFAFA;
+    --white: #FFFFFF;
+    --text: #1F2937;
+    --text-light: #6B7280;
+    --border: #E5E7EB;
+    --success: #10B981;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* Header */
+  header {
+    background: var(--nola-dark);
+    color: var(--white);
+    padding: 16px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--nola-coral);
+  }
+  .header-inner { display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-weight: 800; font-size: 20px; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 12px; height: 12px; background: var(--nola-coral); border-radius: 50%; }
+  .header-tag {
+    background: var(--nola-coral);
+    color: var(--white);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, var(--nola-dark) 0%, #1e293b 100%);
+    color: var(--white);
+    padding: 80px 0 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: var(--nola-coral);
+    border-radius: 50%;
+    opacity: 0.15;
+    filter: blur(80px);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255, 107, 107, 0.2);
+    color: var(--nola-coral);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 107, 107, 0.4);
+  }
+  .hero h1 {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+  }
+  .hero h1 .highlight {
+    background: var(--nola-coral);
+    color: var(--nola-dark);
+    padding: 0 12px;
+    border-radius: 8px;
+    display: inline-block;
+  }
+  .hero p {
+    font-size: 18px;
+    color: #cbd5e1;
+    margin-bottom: 32px;
+    max-width: 480px;
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--nola-coral);
+    color: var(--nola-dark);
+    padding: 14px 28px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+  }
+  .hero-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 107, 107, 0.6);
+  }
+  .hero-meta {
+    margin-top: 40px;
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .hero-meta-item { display: flex; flex-direction: column; }
+  .hero-meta-label { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+  .hero-meta-value { font-size: 15px; color: var(--white); font-weight: 600; margin-top: 4px; }
+
+  .hero-chat-card {
+    background: var(--white);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .hero-chat-header {
+    background: var(--nola-dark);
+    padding: 16px 20px;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 2px solid var(--nola-coral);
+  }
+  .hero-chat-avatar {
+    width: 40px; height: 40px;
+    background: var(--nola-coral);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: var(--nola-dark);
+    font-size: 16px;
+  }
+  .hero-chat-title { font-weight: 700; font-size: 15px; }
+  .hero-chat-status { font-size: 12px; color: #94a3b8; display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+  .status-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  /* Mock conversation preview */
+  .mock-chat {
+    background: #fafafa;
+    padding: 24px 20px;
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+  }
+  .mock-msg {
+    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    animation: fadeUp 0.6s ease both;
+  }
+  .mock-msg.bot {
+    background: var(--white);
+    color: var(--text);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .mock-msg.user {
+    background: var(--nola-coral);
+    color: var(--white);
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+    font-weight: 500;
+  }
+  .mock-msg .source {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-light);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .mock-msg.bot strong { color: var(--nola-dark); }
+  .mock-cta-hint {
+    text-align: center;
+    margin-top: auto;
+    padding: 12px;
+    background: var(--nola-coral-pale);
+    border-radius: 10px;
+    color: var(--nola-dark);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .mock-msg:nth-child(1) { animation-delay: 0.2s; }
+  .mock-msg:nth-child(2) { animation-delay: 0.6s; }
+  .mock-msg:nth-child(3) { animation-delay: 1.4s; }
+  .mock-msg:nth-child(4) { animation-delay: 2.0s; }
+
+  /* Sections */
+  section { padding: 80px 0; }
+  .section-tag {
+    display: inline-block;
+    color: var(--nola-coral);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--nola-dark);
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  .section-subtitle {
+    font-size: 17px;
+    color: var(--text-light);
+    max-width: 640px;
+    margin-bottom: 50px;
+  }
+
+  /* Cards grid */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .card {
+    background: var(--white);
+    padding: 32px 28px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  }
+  .card-icon {
+    width: 48px; height: 48px;
+    background: var(--nola-coral-pale);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 18px;
+  }
+  .card h3 { font-size: 18px; font-weight: 700; color: var(--nola-dark); margin-bottom: 8px; }
+  .card p { color: var(--text-light); font-size: 14px; }
+
+  /* Architecture diagram */
+  .arch-section { background: var(--nola-dark); color: var(--white); }
+  .arch-section .section-title { color: var(--white); }
+  .arch-section .section-subtitle { color: #94a3b8; }
+  .arch-diagram {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 50px 30px;
+    text-align: center;
+  }
+  .arch-flow {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .arch-node {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,107,107,0.3);
+    border-radius: 12px;
+    padding: 20px 18px;
+    min-width: 160px;
+    flex: 1;
+    max-width: 200px;
+  }
+  .arch-node-icon { font-size: 30px; margin-bottom: 10px; }
+  .arch-node-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; color: var(--white); }
+  .arch-node-desc { font-size: 12px; color: #94a3b8; }
+  .arch-arrow { display: flex; align-items: center; color: var(--nola-coral); font-size: 24px; font-weight: 800; }
+  .arch-tools-row { margin-top: 24px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+  .arch-tools-row .arch-node { max-width: 180px; border-color: rgba(255,255,255,0.15); }
+
+  /* Prompt section */
+  .prompt-card {
+    background: var(--nola-dark);
+    color: #e2e8f0;
+    padding: 30px;
+    border-radius: 16px;
+    font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    border: 1px solid rgba(255,107,107,0.3);
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .prompt-card::-webkit-scrollbar { width: 8px; }
+  .prompt-card::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+  .prompt-card::-webkit-scrollbar-thumb { background: var(--nola-coral); border-radius: 4px; }
+  details {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-top: 16px;
+  }
+  details summary {
+    padding: 16px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  details summary::after { content: '↓'; transition: transform 0.2s; }
+  details[open] summary::after { transform: rotate(180deg); }
+  details > div { padding: 0 20px 20px; }
+
+  /* Tools used (AI) */
+  .tools-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 30px;
+  }
+  .tool-item {
+    background: var(--white);
+    padding: 24px;
+    border-radius: 14px;
+    border-left: 4px solid var(--nola-coral);
+  }
+  .tool-name { font-weight: 700; color: var(--nola-dark); margin-bottom: 6px; font-size: 16px; }
+  .tool-use { color: var(--text-light); font-size: 14px; }
+
+  /* CS Value section */
+  .value-section { background: linear-gradient(135deg, #fff 0%, var(--nola-coral-pale) 100%); }
+  .value-list { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+  .value-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: var(--white);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  .value-num {
+    width: 32px; height: 32px;
+    background: var(--nola-coral);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .value-text strong { display: block; color: var(--nola-dark); margin-bottom: 4px; }
+  .value-text { font-size: 14px; color: var(--text-light); }
+
+  /* Footer */
+  footer {
+    background: var(--nola-dark);
+    color: var(--white);
+    padding: 40px 0 30px;
+    border-top: 3px solid var(--nola-coral);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 30px;
+  }
+  .footer h4 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--nola-coral); margin-bottom: 16px; }
+  .footer a { color: #cbd5e1; text-decoration: none; display: block; padding: 4px 0; font-size: 14px; }
+  .footer a:hover { color: var(--white); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 20px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 13px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero { padding: 50px 0 60px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .hero h1 { font-size: 34px; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .arch-flow { flex-direction: column; align-items: center; }
+    .arch-arrow { transform: rotate(90deg); }
+    .tools-list, .value-list, .footer-grid { grid-template-columns: 1fr; }
+    .section-title { font-size: 28px; }
+    section { padding: 50px 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <div class="logo">
+      <span class="logo-dot"></span>
+      <span>SaaS CS Bot</span>
+    </div>
+    <span class="header-tag">DEMO • Portfolio Demo</span>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <span class="hero-tag">CUSTOMER SUCCESS · IA · AUTOMAÇÃO</span>
+        <h1>Atendimento que <span class="highlight">escala</span> sem perder qualidade.</h1>
+        <p>Um chatbot inteligente para o time de CS, capaz de responder dúvidas operacionais em segundos, consultando uma base de conhecimento viva e mantendo o tom humano que o cliente espera.</p>
+        <a href="#chat" class="hero-cta">
+          <span>💬</span> Conversar com o bot
+        </a>
+        <div class="hero-meta">
+          <div class="hero-meta-item">
+            <span class="hero-meta-label">Stack</span>
+            <span class="hero-meta-value">N8N · Groq · Sheets</span>
+          </div>
+          <div class="hero-meta-item">
+            <span class="hero-meta-label">Modelo</span>
+            <span class="hero-meta-value">GPT-OSS 120B</span>
+          </div>
+          <div class="hero-meta-item">
+            <span class="hero-meta-label">Base FAQs</span>
+            <span class="hero-meta-value">30 entradas · 13 categorias</span>
+          </div>
+          <div class="hero-meta-item">
+            <span class="hero-meta-label">Logs / KPIs</span>
+            <span class="hero-meta-value">Auto-registro de interações</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-chat-card" id="chat">
+        <div class="hero-chat-header">
+          <div class="hero-chat-avatar">N</div>
+          <div>
+            <div class="hero-chat-title">CS Assistant</div>
+            <div class="hero-chat-status"><span class="status-dot"></span> Online · Powered by Groq</div>
+          </div>
+        </div>
+        <div class="mock-chat">
+          <div class="mock-msg bot">
+            Olá! 👋 Sobre qual assunto você quer falar?<br><br>
+            ▸ 2 — Cardápio<br>▸ 3 — Integrações Delivery<br>▸ 6 — Financeiro<br>▸ 8 — Suporte Técnico
+          </div>
+          <div class="mock-msg user">
+            2
+          </div>
+          <div class="mock-msg bot">
+            Perfeito, vamos falar sobre <strong>Cardápio</strong>! Qual sua dúvida específica?
+          </div>
+          <div class="mock-msg user">
+            como cadastrar um produto novo
+          </div>
+          <div class="mock-msg bot">
+            Te ajudo! Vai em <strong>Cardápio</strong> &gt; <strong>Produtos</strong> &gt; <strong>Novo Produto</strong>. Preenche nome, categoria, preço e foto. Em <strong>Disponibilidade</strong>, marca os canais. Salvou, já fica ativo.
+            <span class="source">[Fonte: KB-004]</span>
+          </div>
+          <div class="mock-cta-hint">
+            ↓ Clica em "Conversar com o bot" pra testar
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <span class="section-tag">O Problema</span>
+    <h2 class="section-title">Crescer no atendimento sem virar gargalo</h2>
+    <p class="section-subtitle">Restaurantes não esperam. Quando um cliente tem dúvida no meio do rush, cada minuto de espera vira frustração — e potencialmente um pedido perdido. O time de CS precisa responder rápido, com clareza e consistência, mesmo com volume crescendo.</p>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h3>Resposta em segundos</h3>
+        <p>Dúvidas recorrentes (cadastrar produto, integrar iFood, fechar caixa) são respondidas instantaneamente, 24/7.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📚</div>
+        <h3>Fonte única da verdade</h3>
+        <p>Todas as respostas vêm da base no Google Sheets — atualizar uma resposta atualiza o bot inteiro, sem retreino.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤝</div>
+        <h3>Humano quando importa</h3>
+        <p>Quando não sabe, o bot oferece registrar um chamado pro time humano. Sem inventar, sem deixar o cliente no escuro.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="arch-section">
+  <div class="container">
+    <span class="section-tag">Como Funciona</span>
+    <h2 class="section-title">Arquitetura simples, decisão inteligente</h2>
+    <p class="section-subtitle">Quatro componentes conversando entre si. O cliente digita, o agente decide o que fazer, busca contexto na base e responde.</p>
+    <div class="arch-diagram">
+      <div class="arch-flow">
+        <div class="arch-node">
+          <div class="arch-node-icon">💬</div>
+          <div class="arch-node-title">Chat Trigger</div>
+          <div class="arch-node-desc">Cliente envia mensagem pelo widget</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-icon">🧠</div>
+          <div class="arch-node-title">AI Agent</div>
+          <div class="arch-node-desc">Interpreta intenção e orquestra ferramentas</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-icon">✉️</div>
+          <div class="arch-node-title">Resposta Natural</div>
+          <div class="arch-node-desc">Adaptada, com fonte citada (KB-XXX)</div>
+        </div>
+      </div>
+      <div class="arch-tools-row">
+        <div class="arch-node">
+          <div class="arch-node-icon">⚙️</div>
+          <div class="arch-node-title">Groq · GPT-OSS 120B</div>
+          <div class="arch-node-desc">Modelo que decide e escreve</div>
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-icon">📊</div>
+          <div class="arch-node-title">Google Sheets</div>
+          <div class="arch-node-desc">Base de conhecimento (30 FAQs)</div>
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-icon">🔁</div>
+          <div class="arch-node-title">Memória da conversa</div>
+          <div class="arch-node-desc">Mantém contexto das últimas 10 trocas</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <span class="section-tag">O Cérebro do Bot</span>
+    <h2 class="section-title">Prompt: o coração da inteligência</h2>
+    <p class="section-subtitle">A qualidade da resposta depende menos do modelo e mais do prompt. Investi tempo refinando o sistema para lidar com afirmações de intenção, mensagens incompletas e cenários ambíguos — e garantir que o bot nunca invente quando não souber.</p>
+
+    <details open>
+      <summary>Ver o prompt completo do agente</summary>
+      <div>
+        <div class="prompt-card">
+# IDENTIDADE
+Você é o atendente virtual de CS, plataforma SaaS (PDV, KDS, integrações iFood/Rappi/Delivery Direto, financeiro, estoque, equipe).
+
+# CATEGORIAS DA BASE
+PDV, Cardápio, Integração Delivery, KDS, Mesas, Financeiro, Estoque, Equipe, Hardware, Relatórios, Acesso, Suporte, Treinamento
+
+# REGRA SUPREMA
+Você SÓ responde sobre o produto usando informações que vieram da ferramenta. É PROIBIDO inventar IDs (KB-031, KB-100), funcionalidades ou menus. Use APENAS IDs que vieram literalmente do retorno da base.
+
+# MENU NUMERADO (OPÇÕES 1-7)
+Se o usuário enviar APENAS um número de 1 a 7, interprete como seleção de categoria:
+"Perfeito, vamos falar sobre [Categoria]! Qual sua dúvida específica?"
+Mapeamento: 1→PDV, 2→Cardápio, 3→Integração Delivery, 4→KDS, 5→Mesas, 6→Financeiro, 7→Estoque
+NÃO chame a ferramenta — só pergunte qual a dúvida.
+
+# OPÇÃO 8 — ENCAMINHAMENTO DIRETO
+Se o usuário enviar APENAS o "8" (ou "suporte"), encaminhe DIRETO pro atendimento humano com canais de contato + KB-029. NÃO chame a ferramenta.
+
+# VOLTAR AO MENU
+Se enviar "menu", "voltar", "0", "outro assunto" — reapresente o menu de 1 a 8.
+
+# COMO RESPONDER PERGUNTAS REAIS — 4 TIPOS
+
+A) DÚVIDA COM RESPOSTA NA BASE
+→ Chame a ferramenta UMA VEZ, encontre entrada por similaridade semântica, COPIE e ADAPTE os passos do campo Resposta. Termine com [Fonte: KB-XXX] + "Ajudou? Se quiser falar de outro assunto, digite 'menu'".
+
+B) DÚVIDA SEM RESPOSTA NA BASE
+→ Encaminhe pro suporte humano com canais + [Fonte: KB-029]. Sem "Ajudou?".
+
+C) PERGUNTA FORA DO ESCOPO (clima, comida, política, piadas, conversas pessoais)
+→ Recuse educadamente: "Sou um atendente virtual focado em dúvidas sobre o sistema..."
+NÃO chame a ferramenta. Sem fonte.
+
+D) SAUDAÇÃO PURA ("oi", "bom dia")
+→ Reapresente o menu numerado sem chamar ferramenta.
+
+# REGRAS RÍGIDAS
+- NUNCA invente IDs ou features.
+- APENAS UMA chamada à ferramenta por interação.
+- Saudações, menu, voltar e opção 8 NÃO chamam a ferramenta.
+
+# TOM
+PT-BR, profissional e próximo. 3-6 linhas. **Negrito** só pra menus. Acolhedor mas direto.</div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section style="background: var(--white);">
+  <div class="container">
+    <span class="section-tag">Processo</span>
+    <h2 class="section-title">Ferramentas de IA usadas na construção</h2>
+    <p class="section-subtitle">Este projeto foi construído com transparência sobre o uso de IA como apoio. Aqui o que usei e como cada uma contribuiu.</p>
+    <div class="tools-list">
+      <div class="tool-item">
+        <div class="tool-name">Claude (Anthropic)</div>
+        <div class="tool-use">Parceiro principal de construção. Usei pra estruturar a arquitetura, refinar o prompt do agente, gerar a base de conhecimento de 30 FAQs e debugar erros do N8N (como o famoso "Expected object, received null" do Groq + Tools Agent).</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">Groq (LLM em produção)</div>
+        <div class="tool-use">Provedor da API que roda o agente em tempo real. Modelo escolhido: openai/gpt-oss-120b — gratuito, rápido (~1s) e excelente em tool calling. Foi a troca que destravou um bug de integração com o LangChain.</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">N8N AI Agent (Tools)</div>
+        <div class="tool-use">Orquestrador. Usei o nó AI Agent com três sub-nós: Groq Chat Model (cérebro), Memory Buffer (contexto), Google Sheets Tool (base).</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-name">Documentação oficial + Comunidade</div>
+        <div class="tool-use">Cruzei docs do n8n, exemplos da Groq e templates da comunidade ("Chat with a Google Sheet using AI") pra acelerar decisões de design e evitar reinventar a roda.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background: var(--white);">
+  <div class="container">
+    <span class="section-tag">Decisões de Design</span>
+    <h2 class="section-title">Otimizações que vão além do básico</h2>
+    <p class="section-subtitle">Um projeto simples no papel. Entreguei uma plataforma com decisões deliberadas de eficiência, observabilidade e UX.</p>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <h3>Menu numerado guiado</h3>
+        <p>Em vez de input livre, o usuário escolhe a categoria primeiro (1-8). Reduz ambiguidade da IA, economiza ~80% dos tokens (filtro por categoria) e melhora a UX. A opção 8 encaminha direto pro humano.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h3>Logs estruturados pra KPIs</h3>
+        <p>Cada interação é registrada em uma aba "logs" com timestamp, categoria, pergunta, KB consultado e tipo de resposta. Pronto pra plugar no Looker Studio e gerar dashboard de top dúvidas, taxa de auto-resolução e gaps.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔁</div>
+        <h3>Navegação livre</h3>
+        <p>Comandos universais "menu", "voltar", "0" reapresentam as opções a qualquer momento. Elimina becos sem saída — UX clássica de produto bem feito aplicada a chatbot.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="value-section">
+  <div class="container">
+    <span class="section-tag">Aplicações práticas</span>
+    <h2 class="section-title">Como isso destrava o dia a dia do CS</h2>
+    <p class="section-subtitle">Esse não é um experimento de laboratório — é a base de uma operação que escala. Algumas formas concretas de uso:</p>
+    <div class="value-list">
+      <div class="value-item">
+        <div class="value-num">1</div>
+        <div class="value-text"><strong>Atendimento de primeira linha 24/7</strong>Dúvidas recorrentes resolvidas sem ocupar analista. O CS humano foca no que importa: relacionamento e casos complexos.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-num">2</div>
+        <div class="value-text"><strong>Triagem inteligente de chamados</strong>O bot identifica bugs e cria pré-tickets estruturados (cliente, módulo, descrição), economizando minutos do time técnico.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-num">3</div>
+        <div class="value-text"><strong>Base de conhecimento viva</strong>Atualizar uma linha do Sheets atualiza o bot. Insights novos viram resposta no mesmo dia, sem desenvolvimento.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-num">4</div>
+        <div class="value-text"><strong>Onboarding de novos clientes</strong>Quem acabou de comprar pode tirar dúvidas básicas sozinho, reduzindo o time-to-value e a carga de implantação.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-num">5</div>
+        <div class="value-text"><strong>Aprendizado contínuo</strong>Cada conversa logada mostra dúvidas frequentes — input direto pro time de produto e pra próxima rodada de FAQs.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-num">6</div>
+        <div class="value-text"><strong>Tom humano preservado</strong>Diferente de bots de árvore de decisão, esse responde com naturalidade — mantendo o tom da marca.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4>Sobre o projeto</h4>
+        <p style="color: #cbd5e1; font-size: 14px;">Entrega prática  Construído em ~3 horas, do zero, com foco em demonstrar capacidade de resolver problemas reais de CS usando IA e automação acessível.</p>
+      </div>
+      <div>
+        <h4>Recursos</h4>
+        <a href="#chat">💬 Testar o bot</a>
+        <a href="#" id="link-sheets" target="_blank">📊 Base de conhecimento</a>
+        <a href="#" id="link-workflow" target="_blank">⚙️ Workflow do N8N</a>
+      </div>
+      <div>
+        <h4>Contato</h4>
+        <a href="mailto:matheusvmattos1@gmail.com">📧 matheusvmattos1@gmail.com</a>
+        <a href="https://www.linkedin.com/" target="_blank">💼 LinkedIn</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      Construído com ❤️ para o time de CS · Portfolio Demo · 2026
+    </div>
+  </div>
+</footer>
+
+<!-- Chat embed (fonte: docs.n8n.io) -->
+<script type="module">
+  import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+  // ⚠️ TROQUE A URL ABAIXO pelo seu webhook do Chat Trigger do N8N
+  // Você pega ela em: workflow → nó "Quando chega mensagem do cliente" → Chat URL
+  // (com "Make Chat Publicly Available" ativado)
+  const WEBHOOK_URL = 'https://lincon9080.app.n8n.cloud/webhook/nola-cs-chat/chat';
+
+  createChat({
+    webhookUrl: WEBHOOK_URL,
+    mode: 'window',
+    showWelcomeScreen: false,
+    defaultLanguage: 'en',
+    initialMessages: [
+      "Olá! 👋 Sou o assistente virtual de CS. Sobre qual assunto você quer falar?\n\n▸ 1 — PDV / Caixa\n▸ 2 — Cardápio / Produtos\n▸ 3 — Integrações Delivery (iFood, Rappi)\n▸ 4 — KDS / Cozinha\n▸ 5 — Mesas / Comandas\n▸ 6 — Financeiro\n▸ 7 — Estoque\n▸ 8 — Suporte Técnico (encaminhamento direto)\n\nDigite o número ou descreva sua dúvida diretamente. 😊"
+    ],
+    i18n: {
+      en: {
+        title: 'SaaS CS Bot',
+        subtitle: 'Online · responde em segundos',
+        footer: '',
+        getStarted: 'Iniciar conversa',
+        inputPlaceholder: 'Digite sua dúvida...',
+        closeButtonTooltip: 'Fechar'
+      }
+    }
+  });
+
+  // CTA "Conversar com o bot" abre o widget flutuante
+  function openChatWidget() {
+    const toggleBtn = document.querySelector('.chat-window-toggle, [class*="chat-window-toggle"], .chat-button');
+    if (toggleBtn) {
+      toggleBtn.click();
+    } else {
+      // fallback: tenta encontrar qualquer botão do n8n chat
+      const btn = document.querySelector('button[class*="chat"]');
+      if (btn) btn.click();
+    }
+  }
+  document.querySelectorAll('a.hero-cta, a[href="#chat"]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      openChatWidget();
+    });
+  });
+
+  // Atualiza os links do footer caso queira preencher
+  // Substitua pelos seus links públicos
+  document.getElementById('link-sheets').href = 'https://docs.google.com/spreadsheets/d/1uAIEsqgHn0v0HKp42JZ7WDKvzi_JSIuxQske-UBhtDk/edit?usp=sharing';
+  document.getElementById('link-workflow').href = '#'; // cole link do JSON se publicar
+</script>
+
+</body>
+</html>
