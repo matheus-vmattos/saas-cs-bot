@@ -6,6 +6,16 @@
 
 ---
 
+## Screenshots
+
+### Interface
+![CS Bot Interface](Printweb.png)
+
+### Workflow (n8n)
+![n8n Workflow](printworkflow.png)
+
+---
+
 ## What it does
 
 This bot handles the first line of customer success interactions for SaaS platforms, reducing manual support load and improving response time. It answers product questions, guides users through onboarding steps, and escalates complex issues to the human CS team.
@@ -22,11 +32,29 @@ This bot handles the first line of customer success interactions for SaaS platfo
 ## Stack
 
 | Layer | Technology |
-|-------|----------|
+|-------|-----------|
 | Automation | n8n (self-hosted workflow engine) |
 | AI Model | Groq LLM (Llama 3) |
 | Data Layer | Google Sheets API |
 | Frontend | Netlify (static deployment) |
+
+---
+
+## Architecture
+
+```
+User message
+    ↓
+n8n webhook trigger
+    ↓
+Groq LLM (context + prompt)
+    ↓
+Response generation
+    ↓
+Google Sheets logging
+    ↓
+User reply
+```
 
 ---
 
