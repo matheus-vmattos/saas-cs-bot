@@ -1,0 +1,78 @@
+# Ignore files for SaaS CS Bot
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# N8N
+.n8n/
+n8n_data/
+
+# Groq & API Keys
+.groq
+*.groq
+api_keys/
+credentials/
+
+# Google Sheets OAuth tokens
+token.json
+credentials.json
+oauth/
+
+# Node modules (se usar Node.js)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+*.bundle.js
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Temporary
+tmp/
+temp/
+cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+.pnp
+.pnp.js
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Next.js build output
+.next/
+out/
+
+# Gatsby files
+.cache/
+public/
+
+# Misc
+.cache
+.parcel-cache
+.env.production.local
+.env.development.local
+.env.test.local
